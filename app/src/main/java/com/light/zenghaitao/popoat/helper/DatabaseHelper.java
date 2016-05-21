@@ -1,4 +1,4 @@
-package com.light.zenghaitao.popocm.helper;
+package com.light.zenghaitao.popoat.helper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,7 +7,7 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.light.zenghaitao.popocm.model.DatabaseBean;
+import com.light.zenghaitao.popoat.model.DatabaseBean;
 
 import java.sql.SQLException;
 

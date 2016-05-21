@@ -1,4 +1,4 @@
-package com.light.zenghaitao.popocm.adapter;
+package com.light.zenghaitao.popoat.adapter;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.light.zenghaitao.popocm.R;
+import com.light.zenghaitao.popoat.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;

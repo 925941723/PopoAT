@@ -1,4 +1,4 @@
-package com.light.zenghaitao.popocm;
+package com.light.zenghaitao.popoat.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,9 +6,10 @@ import android.widget.ListView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.j256.ormlite.dao.Dao;
-import com.light.zenghaitao.popocm.adapter.ItemAdapter;
-import com.light.zenghaitao.popocm.helper.DatabaseHelper;
-import com.light.zenghaitao.popocm.model.DatabaseBean;
+import com.light.zenghaitao.popoat.R;
+import com.light.zenghaitao.popoat.adapter.ItemAdapter;
+import com.light.zenghaitao.popoat.helper.DatabaseHelper;
+import com.light.zenghaitao.popoat.model.DatabaseBean;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
