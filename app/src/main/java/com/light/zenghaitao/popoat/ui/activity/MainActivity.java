@@ -2,6 +2,7 @@ package com.light.zenghaitao.popoat.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 
 import com.baidu.location.BDLocation;
@@ -17,6 +18,8 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.light.zenghaitao.popoat.R;
+import com.light.zenghaitao.popoat.util.ToastSingletonUtils;
+import com.litesuits.async.SimpleTask;
 
 /**
  * Created by ly-zenghaitao on 2016/5/21.
@@ -129,4 +132,19 @@ public class MainActivity extends Activity{
 
         locationClient.setLocOption(option);
     }
+
+    private SimpleTask<String> task = new SimpleTask<String>() {
+        @Override
+        protected String doInBackground() {
+
+            return "awdawdawdawdawdawdawd";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.v("cesawda", s);
+            ToastSingletonUtils.showLong("dawdawd");
+        }
+    };
 }
