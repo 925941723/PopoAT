@@ -4,6 +4,12 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+        }
+    }
+
     defaultConfig {
         applicationId "com.light.zenghaitao.popoat"
         minSdkVersion 15
@@ -26,6 +32,11 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.9.0+'
     compile files('libs/ormlite-android-4.48.jar')
     compile files('libs/ormlite-core-4.48.jar')
-    compile 'com.google.zxing:core:3.2.1'
-    compile 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+    compile files('libs/baidumapapi_base_v3_7_3.jar')
+    compile files('libs/baidumapapi_cloud_v3_7_3.jar')
+    compile files('libs/baidumapapi_map_v3_7_3.jar')
+    compile files('libs/baidumapapi_radar_v3_7_3.jar')
+    compile files('libs/baidumapapi_search_v3_7_3.jar')
+    compile files('libs/baidumapapi_util_v3_7_3.jar')
+    compile files('libs/locSDK_6.13.jar')
 }
