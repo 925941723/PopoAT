@@ -2,8 +2,11 @@ package com.light.zenghaitao.popoat.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -15,26 +18,38 @@ import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration.LocationMode;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.offline.MKOLSearchRecord;
+import com.baidu.mapapi.map.offline.MKOLUpdateElement;
+import com.baidu.mapapi.map.offline.MKOfflineMap;
+import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.baidu.mapapi.model.LatLng;
 import com.light.zenghaitao.popoat.R;
 import com.light.zenghaitao.popoat.util.ToastSingletonUtils;
-import com.litesuits.async.SimpleTask;
+
+import java.util.ArrayList;
 
 /**
  * Created by ly-zenghaitao on 2016/5/21.
  */
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity implements View.OnClickListener, MKOfflineMapListener{
 
+    private Button button;
     private MapView mMapView = null;
     private BaiduMap baiduMap = null;
 
     //定位相关声明
     private LocationClient locationClient = null;
+    private LocationMode mCurrentMode;
+    BitmapDescriptor mCurrentMarker;
     //自定义图标
-    private BitmapDescriptor mCurrentMarker = null;
     boolean isFirstLoc = true; //是否首次定位
+    //离线主工具
+    private MKOfflineMap mkOfflineMap = null;
+    //已下载的离线地图信息列表
+    private ArrayList<MKOLUpdateElement> localMapList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,35 +79,37 @@ public class MainActivity extends Activity{
         baiduMap.setMyLocationEnabled(false);
         mMapView.onDestroy();
         mMapView = null;
+        mkOfflineMap.destroy();
     }
 
     private void init() {
+        button = (Button) findViewById(R.id.button);
         mMapView = (MapView) findViewById(R.id.bmapview);
         baiduMap = mMapView.getMap();
+
+        button.setOnClickListener(this);
         //开启定位图层
         baiduMap.setMyLocationEnabled(true);
-
+//        mCurrentMode = LocationMode.NORMAL;
+//        baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(
+//                mCurrentMode, true, mCurrentMarker));
         locationClient = new LocationClient(getApplicationContext());//实例化LocationClient类
         locationClient.registerLocationListener(bdLocationListener);//注册监听函数
         this.setLocationOption();//设置定位参数
         locationClient.start();//开始定位
 
-//        baiduMap = mMapView.getMap();
-//
-//        //设定中心点坐标 
-//
-//        LatLng cenpt = new LatLng(29.806651,121.606983);
-//        //定义地图状态
-//        MapStatus mMapStatus = new MapStatus.Builder()
-//                .target(cenpt)
-//                .zoom(18)
-//                .build();
-//        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
-//
-//
-//        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
-//        //改变地图状态
-//        baiduMap.setMapStatus(mMapStatusUpdate);
+        mkOfflineMap = new MKOfflineMap();
+        mkOfflineMap.init(this);
+        //获取已离线下载的地图
+        localMapList = mkOfflineMap.getAllUpdateInfo();
+        if (null==localMapList){
+            ArrayList<MKOLSearchRecord> records = mkOfflineMap.getOfflineCityList();
+            for (MKOLSearchRecord r:records){
+                if (!TextUtils.isEmpty(r.cityName)&&(r.cityName.equals("广东省")||r.cityName.equals("全国基础包"))){
+                    mkOfflineMap.start(r.cityID);
+                }
+            }
+        }
     }
 
     public BDLocationListener bdLocationListener = new BDLocationListener() {
@@ -108,7 +125,7 @@ public class MainActivity extends Activity{
                     .direction(100).latitude(bdLocation.getLatitude())
                     .longitude(bdLocation.getLongitude()).build();
             baiduMap.setMyLocationData(locationData);
-
+            ToastSingletonUtils.showShort(String.valueOf(bdLocation.getLatitude())+","+String.valueOf(bdLocation.getLongitude()));
             if (isFirstLoc){
                 isFirstLoc = false;
 
@@ -125,7 +142,8 @@ public class MainActivity extends Activity{
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        option.setCoorType("bd0911");
+        option.setCoorType("bd09ll");
+        option.setPriority(LocationClientOption.GpsFirst);
         option.setScanSpan(5000);
         option.setIsNeedAddress(true);
         option.setNeedDeviceDirect(true);
@@ -133,18 +151,34 @@ public class MainActivity extends Activity{
         locationClient.setLocOption(option);
     }
 
-    private SimpleTask<String> task = new SimpleTask<String>() {
-        @Override
-        protected String doInBackground() {
+    @Override
+    public void onClick(View v) {
 
-            return "awdawdawdawdawdawdawd";
-        }
+    }
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Log.v("cesawda", s);
-            ToastSingletonUtils.showLong("dawdawd");
+    @Override
+    public void onGetOfflineMapState(int type, int state) {
+        switch (type) {
+            case MKOfflineMap.TYPE_DOWNLOAD_UPDATE: {
+                MKOLUpdateElement update = mkOfflineMap.getUpdateInfo(state);
+                // 处理下载进度更新提示
+                if (update != null) {
+                    ToastSingletonUtils.showShort(String.format("%s : %d%%", update.cityName,
+                            update.ratio));
+                }
+            }
+            break;
+            case MKOfflineMap.TYPE_NEW_OFFLINE:
+                // 有新离线地图安装
+                Log.d("OfflineDemo", String.format("add offlinemap num:%d", state));
+                break;
+            case MKOfflineMap.TYPE_VER_UPDATE:
+                // 版本更新提示
+                // MKOLUpdateElement e = mOffline.getUpdateInfo(state);
+
+                break;
+            default:
+                break;
         }
-    };
+    }
 }
