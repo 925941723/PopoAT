@@ -15,9 +15,12 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration.LocationMode;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.offline.MKOLSearchRecord;
@@ -50,7 +53,10 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
     private MKOfflineMap mkOfflineMap = null;
     //已下载的离线地图信息列表
     private ArrayList<MKOLUpdateElement> localMapList = null;
-
+    //图标icon
+    private BitmapDescriptor bd ;
+    //图标Marker
+    private Marker marker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,12 +86,15 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
         mMapView.onDestroy();
         mMapView = null;
         mkOfflineMap.destroy();
+        bd.recycle();
     }
 
     private void init() {
         button = (Button) findViewById(R.id.button);
         mMapView = (MapView) findViewById(R.id.bmapview);
         baiduMap = mMapView.getMap();
+        bd = BitmapDescriptorFactory
+                .fromResource(R.drawable.icon_gcoding);
 
         button.setOnClickListener(this);
         //开启定位图层
@@ -110,6 +119,18 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
                 }
             }
         }
+
+    }
+
+    private void setCompanyIcon() {
+        LatLng company = new LatLng(23.384654, 113.184234);
+        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
+                .perspective(false).anchor(0.6f, 1f).rotate(30).zIndex(7);
+//        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
+//                .perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+        ooC.animateType(MarkerOptions.MarkerAnimateType.grow);
+
+        marker = (Marker) (baiduMap.addOverlay(ooC));
     }
 
     public BDLocationListener bdLocationListener = new BDLocationListener() {
@@ -133,6 +154,7 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
                         bdLocation.getLongitude());
                 MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
                 baiduMap.animateMapStatus(mapStatusUpdate);
+                setCompanyIcon();
             }
 
         }
