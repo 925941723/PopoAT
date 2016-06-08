@@ -1,6 +1,7 @@
 package com.light.zenghaitao.popoat.ui.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -122,17 +123,6 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
 
     }
 
-    private void setCompanyIcon() {
-        LatLng company = new LatLng(23.384654, 113.184234);
-        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
-                .perspective(false).anchor(0.6f, 1f).rotate(30).zIndex(7);
-//        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
-//                .perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
-        ooC.animateType(MarkerOptions.MarkerAnimateType.grow);
-
-        marker = (Marker) (baiduMap.addOverlay(ooC));
-    }
-
     public BDLocationListener bdLocationListener = new BDLocationListener() {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -155,10 +145,38 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
                 MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
                 baiduMap.animateMapStatus(mapStatusUpdate);
                 setCompanyIcon();
+                setMarkerClick();
             }
 
         }
     };
+
+    private void setCompanyIcon() {
+        LatLng company = new LatLng(23.384654, 113.184234);
+        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
+                .perspective(false).anchor(0.5f, 1f).rotate(0).zIndex(7);
+//        MarkerOptions ooC = new MarkerOptions().position(company).icon(bd)
+//                .perspective(false).anchor(0.5f, 0.5f).rotate(30).zIndex(7);
+        ooC.animateType(MarkerOptions.MarkerAnimateType.grow);
+
+        marker = (Marker) (baiduMap.addOverlay(ooC));
+    }
+
+    private void setMarkerClick(){
+        baiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                ToastSingletonUtils.showShort("这是lanyou公司");
+                LatLng latLng = new LatLng(23.384654, 113.184234);
+                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 18);
+                baiduMap.animateMapStatus(mapStatusUpdate);
+                Intent intent = new Intent(MainActivity.this, TestActivity.class);
+                startActivity(intent);
+
+                return true;
+            }
+        });
+    }
 
     private void setLocationOption(){
         LocationClientOption option = new LocationClientOption();
@@ -175,7 +193,7 @@ public class MainActivity extends Activity implements View.OnClickListener, MKOf
 
     @Override
     public void onClick(View v) {
-
+        isFirstLoc = true;
     }
 
     @Override
